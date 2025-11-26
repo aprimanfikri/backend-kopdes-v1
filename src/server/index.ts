@@ -1,5 +1,5 @@
 import app from "@/app";
-import { PORT } from "@/config/env";
+import { PORT } from "@/configs/env";
 
 Bun.serve({
   port: PORT,

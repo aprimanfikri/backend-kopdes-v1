@@ -1,5 +1,6 @@
-import { CORS_ORIGIN } from "@/config/env";
+import { CORS_ORIGIN } from "@/configs/env";
 import { errorHandler } from "@/middlewares/error.middleware";
+import memberRoute from "@/routes/member.route";
 import { RESPONSE_CODES } from "@/types";
 import { responseHandler } from "@/utils/response";
 import { Context, Hono } from "hono";
@@ -27,6 +28,8 @@ app.get("/health", (c: Context) =>
     200
   )
 );
+
+app.route("/member", memberRoute);
 
 app.onError(errorHandler);
 
