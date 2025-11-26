@@ -1,4 +1,6 @@
+import { Member } from "@/generated/prisma/client";
 import { memberRepository } from "@/repositories/member.repository";
+import { redisDel, redisGet, redisSet } from "@/utils/redis";
 import {
   memberCreateSchema,
   MemberCreateSchema,
@@ -20,49 +22,65 @@ class MemberService {
   }
 
   async findAll() {
-    return await memberRepository.findAll();
+    const key = "members";
+    const cached = await redisGet<Member[]>(key);
+    if (cached) return cached;
+    const members = await memberRepository.findAll();
+    await redisSet(key, members);
+    return members;
   }
 
   async findById(id: string) {
-    return await memberRepository.findById(id);
+    const key = `member:${id}`;
+    const cached = await redisGet<Member>(key);
+    if (cached) return cached;
+    const member = await memberRepository.findById(id);
+    if (!member) throw new HTTPException(404, { message: "Member not found" });
+    await redisSet(key, member);
+    return member;
   }
 
   async findByCode(code: string) {
-    return await memberRepository.findByCode(code);
+    const key = `member:${code}`;
+    const cached = await redisGet<Member>(key);
+    if (cached) return cached;
+    const member = await memberRepository.findByCode(code);
+    if (!member) throw new HTTPException(404, { message: "Member not found" });
+    await redisSet(key, member);
+    return member;
   }
 
   async create(body: MemberCreateSchema) {
     const data = memberCreateSchema.parse(body);
-
     const exist = await memberRepository.findByCode(data.code);
-
-    if (exist) {
-      throw new HTTPException(400, { message: "Code already exists" });
-    }
-
-    return await memberRepository.create(data);
+    if (exist) throw new HTTPException(400, { message: "Code already exists" });
+    const member = await memberRepository.create(data);
+    await redisSet(`member:${member.id}`, member);
+    await redisSet(`member:${member.code}`, member);
+    await redisDel("members");
+    return member;
   }
 
   async update(id: string, body: MemberUpdateSchema) {
     const exist = await memberRepository.findById(id);
-
-    if (!exist) {
-      throw new HTTPException(404, { message: "Member not found" });
-    }
-
+    if (!exist) throw new HTTPException(404, { message: "Member not found" });
     const data = memberUpdateSchema.parse(body);
-
-    const version = exist.version;
-
-    if (data.version !== version) {
+    if (data.version !== exist.version) {
       throw new HTTPException(409, { message: "Version conflict" });
     }
-
-    return await memberRepository.update(id, data);
+    const member = await memberRepository.update(id, data);
+    await redisSet(`member:${member.id}`, member);
+    await redisSet(`member:${member.code}`, member);
+    await redisDel("members");
+    return member;
   }
 
   async delete(id: string) {
-    return await memberRepository.delete(id);
+    const member = await memberRepository.delete(id);
+    await redisDel(`member:${member.id}`);
+    await redisDel(`member:${member.code}`);
+    await redisDel("members");
+    return member;
   }
 }
 
