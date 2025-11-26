@@ -31,13 +31,12 @@ class MemberRepository {
     id: string,
     data: Prisma.MemberUpdateInput & { version: number }
   ) {
-    const currentVersion = data.version;
     const { version, ...rest } = data;
     return await prisma.member.update({
       where: {
         id_version: {
           id,
-          version: currentVersion,
+          version,
         },
       },
       data: {
