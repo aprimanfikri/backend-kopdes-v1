@@ -61,9 +61,8 @@ jobs:
       - name: Deploy on server
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             set -e
-
             echo "Loading docker image..."
             docker load -i /tmp/backend-kopdes.tar.gz
 
@@ -77,11 +76,11 @@ jobs:
               -p 4001:4001 \
               -e PORT=4001 \
               -e NODE_ENV=prod \
-              -e CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
-              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              -e REDIS_URL=${{ secrets.REDIS_URL }} \
+              -e CORS_ORIGIN='"${{ secrets.CORS_ORIGIN }}"' \
+              -e DATABASE_URL='"${{ secrets.DATABASE_URL }}"' \
+              -e REDIS_URL='"${{ secrets.REDIS_URL }}"' \
               backend-kopdes:latest
 
             echo "Deployment complete!"
             rm -f /tmp/backend-kopdes.tar.gz
-          EOF
+            '
