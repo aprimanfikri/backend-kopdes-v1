@@ -11,7 +11,6 @@ const app = new Hono();
 app.use(logger());
 
 app.use(
-  "*",
   cors({
     origin: ["https://kopdes.xfrhk.com"],
     credentials: true,
