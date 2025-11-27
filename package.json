@@ -3,13 +3,31 @@
   "scripts": {
     "dev": "bun run --hot src/server/index.ts",
     "start": "bun run dist/index.js",
-    "build": "bun run build.ts"
+    "build": "bun run build.ts",
+    "lint": "eslint . --ext .ts,.mts,.cts",
+    "lint:fix": "eslint . --ext .ts,.mts,.cts --fix",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "hono": "^4.10.6"
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "dotenv": "^17.2.3",
+    "hono": "^4.10.6",
+    "pg": "^8.16.3",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/bun": "latest",
-    "bun-plugin-dts": "^0.3.0"
+    "@types/pg": "^8.15.6",
+    "bun-plugin-dts": "^0.3.0",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "prisma": "^7.0.0",
+    "typescript-eslint": "^8.48.0"
   }
 }

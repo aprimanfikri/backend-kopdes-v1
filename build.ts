@@ -1,10 +1,12 @@
-import type { BuildConfig } from "bun";
 import dts from "bun-plugin-dts";
+import type { BuildConfig } from "bun";
 
 const defaultBuildConfig: BuildConfig = {
   entrypoints: ["./src/server/index.ts"],
   outdir: "./dist",
-  target: "node",
+  target: "bun",
+  minify: true,
+  compile: true,
 };
 
 Promise.all([
