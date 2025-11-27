@@ -27,11 +27,11 @@ jobs:
       - name: Copy image to server
         run: |
           scp -o StrictHostKeyChecking=no backend-kopdes.tar \
-          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/backend-kopdes.tar
+          xfrhk@27.112.78.244:/root/backend-kopdes.tar
 
       - name: Deploy on server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no xfrhk@27.112.78.244 << 'EOF'
             set -e
 
             echo "Loading docker image..."
