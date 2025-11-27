@@ -39,7 +39,7 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY --from=builder --chown=bunuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=bunuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=bunuser:nodejs /app/package.json ./
-COPY --from=builder --chown=bunuser:nodejs /app/server.exe ./server.exe
+COPY --from=builder --chown=bunuser:nodejs /app/server ./server
 COPY --from=builder --chown=bunuser:nodejs /app/prisma ./prisma
 
 # Switch to non-root user
