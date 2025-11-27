@@ -18,7 +18,7 @@ app.use(
       if (!origin) return "*";
       if (CORS_ORIGIN.includes(origin)) return origin;
       console.warn(`[CORS] Blocked origin: ${origin}`);
-      return null;
+      return "";
     },
     credentials: true,
   })

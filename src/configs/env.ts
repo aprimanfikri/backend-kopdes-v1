@@ -9,6 +9,8 @@ function requiredEnv(name: string): string {
 
 export const PORT = Number(Bun.env.PORT || 4001);
 export const NODE_ENV = requiredEnv("NODE_ENV");
-export const CORS_ORIGIN = requiredEnv("CORS_ORIGIN").split(",");
+export const CORS_ORIGIN = requiredEnv("CORS_ORIGIN")
+  .split(",")
+  .map((o) => o.trim());
 export const DATABASE_URL = requiredEnv("DATABASE_URL");
 export const REDIS_URL = requiredEnv("REDIS_URL");
