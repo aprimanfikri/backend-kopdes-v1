@@ -4,11 +4,11 @@ WORKDIR /app
 
 # Install dependencies first (better cache layer)
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+RUN bun install
 
 # Copy source code and generate Prisma client
 COPY . .
-RUN bunx prisma generate
+RUN bun run db:generate
 
 # Build application
 RUN bun run build
