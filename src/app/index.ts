@@ -13,9 +13,13 @@ app.use(logger());
 
 app.use(
   cors({
-    origin: CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "X-Service-Token"],
+    origin: (origin: string) => {
+      if (!origin) return "*";
+      if (CORS_ORIGIN.includes(origin)) return origin;
+      console.warn(`[CORS] Blocked origin: ${origin}`);
+      return null;
+    },
+    credentials: true,
   })
 );
 
