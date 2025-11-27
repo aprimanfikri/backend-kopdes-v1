@@ -1,4 +1,3 @@
-import { Member } from "@/generated/prisma/client";
 import { HTTPException } from "hono/http-exception";
 import { redisDel, redisGet, redisSet } from "@/utils/redis";
 import { memberRepository } from "@/repositories/member.repository";
@@ -8,6 +7,7 @@ import {
   memberUpdateSchema,
   MemberUpdateSchema,
 } from "@/validations/member";
+import { Member } from "@/database/schema";
 
 class MemberService {
   private static _instance: MemberService;

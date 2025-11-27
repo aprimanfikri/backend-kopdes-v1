@@ -79,7 +79,10 @@ jobs:
             -e CORS_ORIGIN="${{ secrets.CORS_ORIGIN }}" \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             -e REDIS_URL="${{ secrets.REDIS_URL }}" \
-            backend-kopdes:latest
+            backend-kopdes:latest 
+
+            echo "Integrating with kong-net"
+            docker network connect kong-net backend-kopdes
 
           echo "Deployment complete!"
           rm -f /tmp/backend-kopdes.tar.gz
