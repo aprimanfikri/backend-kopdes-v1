@@ -61,7 +61,7 @@ jobs:
       - name: Deploy on server
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             set -e
 
             echo "Loading docker image..."
@@ -69,9 +69,6 @@ jobs:
 
             echo "Stopping old container..."
             docker rm -f backend-kopdes || true
-
-            echo "Cleaning up unused images..."
-            docker image prune -f
 
             echo "Starting new container..."
             docker run -d \
@@ -87,4 +84,4 @@ jobs:
 
             echo "Deployment complete!"
             rm -f /tmp/backend-kopdes.tar.gz
-          '
+          EOF
