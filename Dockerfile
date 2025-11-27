@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies first (better cache layer)
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY . .
@@ -21,6 +21,9 @@ RUN bunx prisma generate
 # Build application
 RUN bun run build
 
+# Compile application
+RUN bun run compile
+
 # === Runner Stage ===
 FROM oven/bun:1-alpine AS runner
 WORKDIR /app
@@ -36,6 +39,7 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY --from=builder --chown=bunuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=bunuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=bunuser:nodejs /app/package.json ./
+COPY --from=builder --chown=bunuser:nodejs /app/server.exe ./server.exe
 COPY --from=builder --chown=bunuser:nodejs /app/prisma ./prisma
 
 # Switch to non-root user
@@ -49,4 +53,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 4001
 
 # Start application
-CMD ["bun", "run", "start"]
+CMD ["./server"]

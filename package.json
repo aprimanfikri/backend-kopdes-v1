@@ -9,7 +9,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "compile": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server ./src/server/index.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.0",
