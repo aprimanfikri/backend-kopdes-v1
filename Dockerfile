@@ -10,6 +10,8 @@ COPY . .
 
 RUN bun run build
 
+RUN bun run compile
+
 FROM oven/bun:1-alpine AS runner
 
 WORKDIR /app
