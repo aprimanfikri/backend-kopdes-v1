@@ -1,5 +1,5 @@
-import { requiredString } from "@/utils";
 import { z } from "zod";
+import { requiredString } from "@/utils";
 
 export const memberCreateSchema = z.object({
   name: requiredString("Name"),

@@ -1,5 +1,5 @@
-import { memberController } from "@/controllers/member.controller";
 import { Context, Hono } from "hono";
+import { memberController } from "@/controllers/member.controller";
 
 const memberRoute = new Hono();
 

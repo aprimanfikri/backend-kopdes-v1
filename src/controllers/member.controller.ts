@@ -1,8 +1,8 @@
-import { memberService } from "@/services/member.service";
+import { Context } from "hono";
 import { RESPONSE_CODES } from "@/types";
 import { responseHandler } from "@/utils/response";
+import { memberService } from "@/services/member.service";
 import { MemberCreateSchema, MemberUpdateSchema } from "@/validations/member";
-import { Context } from "hono";
 
 class MemberController {
   private static _instance: MemberController;
