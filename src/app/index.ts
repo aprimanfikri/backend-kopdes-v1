@@ -11,16 +11,52 @@ const app = new Hono();
 
 app.use(logger());
 
+function normalizeOrigin(origin?: string): string | null {
+  if (!origin) return null;
+  try {
+    const u = new URL(origin);
+    const p = u.port ? `:${u.port}` : "";
+    return `${u.protocol}//${u.hostname}${p}`;
+  } catch {
+    return origin;
+  }
+}
+
+const ALLOWED = CORS_ORIGIN.map((o) => normalizeOrigin(o)).filter(
+  (v): v is string => Boolean(v)
+);
+
+function isAllowed(origin?: string): string {
+  const no = normalizeOrigin(origin);
+  if (!no) return "";
+  for (const raw of CORS_ORIGIN) {
+    try {
+      const a = new URL(raw);
+      const o = new URL(no);
+      const portMatch = a.port ? a.port === o.port : true;
+      if (a.protocol === o.protocol && a.hostname === o.hostname && portMatch)
+        return no;
+    } catch {
+      if (ALLOWED.includes(no)) return no;
+      if (raw.includes("*")) {
+        const rx = new RegExp(
+          "^" + raw.replace(/\./g, "\\.").replace(/\*/g, ".*") + "$"
+        );
+        if (rx.test(no)) return no;
+      }
+    }
+  }
+  console.warn(`[CORS] Blocked origin: ${origin}`);
+  return "";
+}
+
 app.use(
   "*",
   cors({
-    origin: (origin: string) => {
-      if (!origin) return "*";
-      if (CORS_ORIGIN.includes(origin)) return origin;
-      console.warn(`[CORS] Blocked origin: ${origin}`);
-      return "";
-    },
+    origin: (origin: string | undefined) => isAllowed(origin),
     credentials: true,
+    allowMethods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
