@@ -12,6 +12,7 @@ const app = new Hono();
 app.use(logger());
 
 app.use(
+  "*",
   cors({
     origin: (origin: string) => {
       if (!origin) return "*";
