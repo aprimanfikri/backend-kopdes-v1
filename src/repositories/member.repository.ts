@@ -1,5 +1,10 @@
 import { db } from "@/database/client";
-import { MemberInput, members, MemberUpdate } from "@/database/schema";
+import {
+  MemberCreateInput,
+  members,
+  MemberUpdateInput,
+  Member,
+} from "@/database/schema";
 import { eq, and } from "drizzle-orm";
 
 class MemberRepository {
@@ -12,16 +17,16 @@ class MemberRepository {
     return this._instance;
   }
 
-  async findAll() {
+  async findAll(): Promise<Member[]> {
     return await db.select().from(members);
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Member | null> {
     const result = await db.select().from(members).where(eq(members.id, id));
     return result[0] ?? null;
   }
 
-  async findByCode(code: string) {
+  async findByCode(code: string): Promise<Member | null> {
     const result = await db
       .select()
       .from(members)
@@ -29,12 +34,12 @@ class MemberRepository {
     return result[0] ?? null;
   }
 
-  async create(data: MemberInput) {
+  async create(data: MemberCreateInput): Promise<Member> {
     const result = await db.insert(members).values(data).returning();
     return result[0];
   }
 
-  async update(id: string, data: MemberUpdate) {
+  async update(id: string, data: MemberUpdateInput): Promise<Member> {
     const { version, ...rest } = data;
     const result = await db
       .update(members)
@@ -50,7 +55,7 @@ class MemberRepository {
     return result[0];
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<Member | null> {
     const result = await db
       .delete(members)
       .where(eq(members.id, id))

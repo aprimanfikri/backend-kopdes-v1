@@ -28,16 +28,13 @@ export const members = pgTable(
       .$onUpdateFn(() => new Date()),
     version: integer("version").notNull().default(0),
   },
-  (table) => {
-    return {
-      idVersionIdx: uniqueIndex("members_id_version_unique").on(
-        table.id,
-        table.version
-      ),
-    };
-  }
+  (table) => [
+    uniqueIndex("members_id_version_unique").on(table.id, table.version),
+  ]
 );
 
 export type Member = typeof members.$inferSelect;
-export type MemberInput = typeof members.$inferInsert;
-export type MemberUpdate = Partial<MemberInput> & { version: number };
+export type MemberCreateInput = typeof members.$inferInsert;
+export type MemberUpdateInput = Partial<MemberCreateInput> & {
+  version: number;
+};

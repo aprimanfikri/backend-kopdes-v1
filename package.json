@@ -6,10 +6,6 @@
     "build": "bun run build.ts",
     "lint": "eslint . --ext .ts,.mts,.cts",
     "lint:fix": "eslint . --ext .ts,.mts,.cts --fix",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:reset": "prisma migrate reset",
     "compile": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server ./src/server/index.ts"
   },
   "dependencies": {
