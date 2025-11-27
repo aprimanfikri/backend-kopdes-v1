@@ -1,0 +1,56 @@
+name: Deploy backend-kopdes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t backend-kopdes:latest .
+
+      - name: Save Docker Image to TAR
+        run: docker save backend-kopdes:latest > backend-kopdes.tar
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy image to server
+        run: |
+          scp -o StrictHostKeyChecking=no backend-kopdes.tar \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/root/backend-kopdes.tar
+
+      - name: Deploy on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+
+            echo "Loading docker image..."
+            docker load < /root/backend-kopdes.tar
+
+            echo "Stopping old container..."
+            docker rm -f backend-kopdes || true
+
+            echo "Starting new container with ENV from GitHub..."
+            docker run -d \
+              --name backend-kopdes \
+              --restart always \
+              -p 4001:4001 \
+              -e PORT=4001 \
+              -e NODE_ENV=prod \
+              -e CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e REDIS_URL=${{ secrets.REDIS_URL }} \
+              backend-kopdes:latest
+
+            echo "Deployment complete!"
+          EOF
