@@ -77,6 +77,7 @@ class MemberService {
 
   async delete(id: string) {
     const member = await memberRepository.delete(id);
+    if (!member) throw new HTTPException(404, { message: "Member not found" });
     await redisDel(`member:${member.id}`);
     await redisDel(`member:${member.code}`);
     await redisDel("members");
