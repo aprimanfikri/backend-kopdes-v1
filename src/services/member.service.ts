@@ -1,5 +1,4 @@
 import { HTTPException } from "hono/http-exception";
-import { redisDel, redisGet, redisSet } from "@/utils/redis";
 import { memberRepository } from "@/repositories/member.repository";
 import {
   memberCreateSchema,
@@ -22,31 +21,18 @@ class MemberService {
   }
 
   async findAll() {
-    const key = "members";
-    const cached = await redisGet<Member[]>(key);
-    if (cached) return cached;
-    const members = await memberRepository.findAll();
-    await redisSet(key, members);
-    return members;
+    return memberRepository.findAll();
   }
 
   async findById(id: string) {
-    const key = `member:${id}`;
-    const cached = await redisGet<Member>(key);
-    if (cached) return cached;
     const member = await memberRepository.findById(id);
     if (!member) throw new HTTPException(404, { message: "Member not found" });
-    await redisSet(key, member);
     return member;
   }
 
   async findByCode(code: string) {
-    const key = `member:${code}`;
-    const cached = await redisGet<Member>(key);
-    if (cached) return cached;
     const member = await memberRepository.findByCode(code);
     if (!member) throw new HTTPException(404, { message: "Member not found" });
-    await redisSet(key, member);
     return member;
   }
 
@@ -55,9 +41,6 @@ class MemberService {
     const exist = await memberRepository.findByCode(data.code);
     if (exist) throw new HTTPException(400, { message: "Code already exists" });
     const member = await memberRepository.create(data);
-    await redisSet(`member:${member.id}`, member);
-    await redisSet(`member:${member.code}`, member);
-    await redisDel("members");
     return member;
   }
 
@@ -69,18 +52,12 @@ class MemberService {
       throw new HTTPException(409, { message: "Version conflict" });
     }
     const member = await memberRepository.update(id, data);
-    await redisSet(`member:${member.id}`, member);
-    await redisSet(`member:${member.code}`, member);
-    await redisDel("members");
     return member;
   }
 
   async delete(id: string) {
     const member = await memberRepository.delete(id);
     if (!member) throw new HTTPException(404, { message: "Member not found" });
-    await redisDel(`member:${member.id}`);
-    await redisDel(`member:${member.code}`);
-    await redisDel("members");
     return member;
   }
 }
